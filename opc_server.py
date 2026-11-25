@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify
 from opcua import Client
 
@@ -5,10 +7,9 @@ app = Flask(__name__)
 
 @app.route("/api/axis-positions")
 def axis_positions():
-    url = "opc.tcp://172.30.0.10:4840"
-    client = Client(url)
-    client.set_user("OpcUaOperator")
-    client.set_password("kuka")
+    client = Client(os.getenv("OPCUA_URL", "opc.tcp://localhost:4840"))
+    client.set_user(os.getenv("OPCUA_USER", ""))
+    client.set_password(os.getenv("OPCUA_PASSWORD", ""))
     try:
         client.connect()
         axis1 = client.get_node("ns=8;s=5001.Robot.Axes.A1.ParameterSet.ActualPosition").get_value()
